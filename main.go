@@ -26,16 +26,14 @@ func main() {
 			"sub": "john",
 			"foo": 2,
 		})
+
 	s, err := t.SignedString(key)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	fmt.Println("========================signed jwt key========================")
 	fmt.Println(s)
-	// b, err := json.Marshal(t)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(string(b))
 
 	// custom claims
 	type MyCustomClaims struct {
@@ -61,9 +59,8 @@ func main() {
 	}
 
 	// c, _ := json.Marshal(claims)
-	fmt.Println("=======================")
-	// fmt.Printf(string(c))
-	// jwt.SigningMethodHS256
+	fmt.Println()
+	fmt.Println("===========Test creating a new jwt token with custom claims ============")
 	mycustomtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	ss, err := mycustomtoken.SignedString([]byte("hihihi"))
 	if err != nil {
@@ -71,28 +68,36 @@ func main() {
 	}
 	fmt.Println(ss)
 
-	// parsedToken, err := jwt.Parse(ss, func(t *jwt.Token) (interface{}, error) {
+	// verifiedParsedToken, err := jwt.Parse(ss, func(t *jwt.Token) (interface{}, error) {
 	// 	return []byte("hihihi"), nil
 	// })
 
 	// testToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJiYSI6ImhleWZvb2ZvbyIsImlzcyI6InRlc3QiLCJzdWIiOiJzb21lYm9keSIsImF1ZCI6WyJzb21lYm9keV9lbHNlIiwiam9yZGFuIl0sIm5iZiI6MTcwNjk1NTk0NywiaWF0IjoxNzA2OTU1OTQ3LCJqdGkiOiIxIn0.dZaozaQ6hr4oknRZfaPwVxC3u99IARm2AqH892oHvo0"
-	// parsedToken, err := jwt.Parse(testToken, func(t *jwt.Token) (interface{}, error) {
+	// verifiedParsedToken, err := jwt.Parse(testToken, func(t *jwt.Token) (interface{}, error) {
 	// 	return []byte("hihihi"), nil
 	// })
 
-	parsedToken, err := jwt.ParseWithClaims(ss, &MyCustomClaims{}, func(t *jwt.Token) (interface{}, error) {
+	verifiedParsedToken, err := jwt.ParseWithClaims(ss, &MyCustomClaims{}, func(t *jwt.Token) (interface{}, error) {
 		return []byte("hihihi"), nil
 	})
 
 	if err != nil {
-		log.Println(err)
+		fmt.Println()
+		fmt.Println("------verifiedParsedToken error------")
+		log.Fatalln(err)
 	}
 
-	// fmt.Println(parsedToken)
+	// fmt.Println(verifiedParsedToken)
+	issuedAt, err := verifiedParsedToken.Claims.GetIssuedAt()
+	if err != nil {
+		fmt.Println()
+		fmt.Println("------GetIssuedAt error------")
+		log.Fatalln(err)
+	}
+	fmt.Println()
+	fmt.Printf("test token issued at : %s", issuedAt)
 
-	fmt.Println(parsedToken.Claims.GetIssuedAt())
-
-	// d, err := json.Marshal(parsedToken)
+	// d, err := json.Marshal(verifiedParsedToken)
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
